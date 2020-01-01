@@ -24,6 +24,12 @@ public class Map {
         rooms = new List<Room>();
 
         generate(epochs);
+        chooseEndRoom();
+
+        map[(startRoom.bounds[2] + startRoom.bounds[0]) / 2, 
+                (startRoom.bounds[1] + startRoom.bounds[3]) / 2] = Tile.SPAWN;
+        map[(endRoom.bounds[2] + endRoom.bounds[0]) / 2, 
+                (endRoom.bounds[1] + endRoom.bounds[3]) / 2] = Tile.END;
     }
 
     private void generateStartRoom() {
@@ -90,12 +96,14 @@ public class Map {
         expansionRoomBounds[2] = expansionRoomY + expansionRoomHeight - 1;
         expansionRoomBounds[3] = expansionRoomX;
 
-        Room expansionRoom = new Room(false, false, true, false, expansionRoomBounds);
+        Room expansionRoom = new Room(false, false, true, false, 
+                expansionRoomBounds, room.numRoomsFromSpawn + 1);
         if(expansionRoom.IsLegal(map)) {
             rooms.Add(expansionRoom);
             expansionRoom.PlaceTiles(map);
             room.openNorth = true;
             map[room.bounds[0],doorX] = Tile.FLOOR;
+            room.expansionChance /= 2;
             return true;
         }
         return false;
@@ -122,7 +130,8 @@ public class Map {
         expansionRoomBounds[2] = expansionRoomY + expansionRoomHeight - 1;
         expansionRoomBounds[3] = expansionRoomX;
 
-        Room expansionRoom = new Room(true, false, false, false, expansionRoomBounds);
+        Room expansionRoom = new Room(true, false, false, false, 
+                expansionRoomBounds, room.numRoomsFromSpawn + 1);
         if(expansionRoom.IsLegal(map)) {
             rooms.Add(expansionRoom);
             expansionRoom.PlaceTiles(map);
@@ -154,7 +163,8 @@ public class Map {
         expansionRoomBounds[2] = expansionRoomY + expansionRoomHeight - 1;
         expansionRoomBounds[3] = expansionRoomX;
 
-        Room expansionRoom = new Room(false, false, false, true, expansionRoomBounds);
+        Room expansionRoom = new Room(false, false, false, true, 
+                expansionRoomBounds, room.numRoomsFromSpawn + 1);
         if(expansionRoom.IsLegal(map)) {
             rooms.Add(expansionRoom);
             expansionRoom.PlaceTiles(map);
@@ -186,7 +196,8 @@ public class Map {
         expansionRoomBounds[2] = expansionRoomY + expansionRoomHeight - 1;
         expansionRoomBounds[3] = expansionRoomX;
 
-        Room expansionRoom = new Room(false, true, false, false, expansionRoomBounds);
+        Room expansionRoom = new Room(false, true, false, false, 
+                expansionRoomBounds, room.numRoomsFromSpawn + 1);
         if(expansionRoom.IsLegal(map)) {
             rooms.Add(expansionRoom);
             expansionRoom.PlaceTiles(map);
@@ -199,6 +210,15 @@ public class Map {
 
     private int generateRoomSize() {
         return random.Next(Room.SIZE_RANGE) + Room.MIN_SIZE;
+    }
+
+    private void chooseEndRoom() {
+        int maxRoomDist = 0;
+        foreach(Room room in rooms) {
+            if(room.numRoomsFromSpawn > maxRoomDist) {
+                endRoom = room;
+            }
+        }
     }
 
     public Tile[,] GetTiles() {

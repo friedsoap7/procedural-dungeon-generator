@@ -5,23 +5,25 @@ public class Room {
     public bool openNorth, openEast, openSouth, openWest;
     public double expansionChance;
     public bool isCorridor;
+    public int numRoomsFromSpawn;
 
     public const int MIN_SIZE = 5;
     public const int SIZE_RANGE = 15;
 
     public Room(bool openNorth, bool openEast, bool openSouth,
-            bool openWest, int[] bounds) {
+            bool openWest, int[] bounds, int numRoomsFromSpawn) {
         this.openNorth = openNorth;
         this.openEast = openEast;
         this.openWest = openWest;
         this.openSouth = openSouth;
         this.bounds = bounds;
+        this.numRoomsFromSpawn = numRoomsFromSpawn;
         width = bounds[1] - bounds[3];
         height = bounds[2] - bounds[0];
         expansionChance = 0.5;
     }
 
-    public Room(int[] bounds) : this (false, false, false, false, bounds) {}
+    public Room(int[] bounds) : this (false, false, false, false, bounds, 0) {}
 
     public bool IsLegal(Tile[,] map) {
         if(bounds[0] < 0 || bounds[2] >= map.GetLength(0)) return false;

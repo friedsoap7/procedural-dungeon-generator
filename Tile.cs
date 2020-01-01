@@ -1,3 +1,3 @@
 public enum Tile {
-    WALL, FLOOR, VOID
+    WALL, FLOOR, VOID, SPAWN, END
 }
